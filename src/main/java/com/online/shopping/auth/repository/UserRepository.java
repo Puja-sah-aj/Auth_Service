@@ -1,3 +1,4 @@
+
 package com.online.shopping.auth.repository;
 
 import com.online.shopping.auth.entity.User;
@@ -10,10 +11,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     //boolean existsByEmail(String email);
 
-    boolean existsByPhoneNumber(String phoneNumber);
-
-
-
-
-
+    boolean existsByPhone(String phone);
+    Optional<User> findByPhone(String phone);
 }
+

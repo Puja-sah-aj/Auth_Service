@@ -8,6 +8,8 @@ import java.util.UUID;
 
 @Entity
 @Data
+@Entity
+@Table(name = "users") // Explicitly naming the table 'users' is good practice
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -15,9 +17,14 @@ public class User {
 
     private String name;
     private String email;
+
     @Column(unique = true, nullable = false)
-    private String phoneNumber;
+    private String phone;
+
     private String role = "USER";
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private LoginEntity login;
 }
