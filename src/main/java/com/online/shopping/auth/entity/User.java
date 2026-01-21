@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
 @Data
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -19,6 +21,8 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String phone;
+    String dateOfBirth;
+    String gender;
 
     private String role = "USER";
 
@@ -26,4 +30,7 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private LoginEntity login;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAddress> userAddresses;
 }
