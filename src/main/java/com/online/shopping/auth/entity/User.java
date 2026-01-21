@@ -6,10 +6,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
+
 @Data
 @Entity
-@Table(name = "users") // Explicitly naming the table 'users' is good practice
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -57,6 +57,7 @@ public class LoginService {
         
         // Saving the user will cascade and save the loginEntity because of CascadeType.ALL
         userRepository.save(user);
+        System.out.println(otp);
 
         // For testing purposes, returning the OTP in the response
         return "OTP sent to " + loginRequest.getPhoneNumber() + ": " + otp;

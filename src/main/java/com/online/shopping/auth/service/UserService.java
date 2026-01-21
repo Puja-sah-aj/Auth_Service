@@ -6,6 +6,7 @@ import com.online.shopping.auth.entity.User;
 import com.online.shopping.auth.exception.UserAlreadyExist;
 import com.online.shopping.auth.exception.UserNotFoundException;
 import com.online.shopping.auth.repository.UserRepository;
+import com.online.shopping.auth.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +19,18 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    JwtUtil jwtUtil;
     //signup
     public UserResponse signup(UserRequest userRequest)throws UserAlreadyExist{
 
-        if (userRepository.existsByPhoneNumber(userRequest.getPhoneNumber())) {
+        if (userRepository.existsByPhone(userRequest.getPhoneNumber())) {
             throw new UserAlreadyExist("Phone number already registered");
         }
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
-        user.setPhoneNumber(userRequest.getPhoneNumber());
+        user.setPhone(userRequest.getPhoneNumber());
 
         User savedUser = userRepository.save(user);
 
@@ -35,13 +38,19 @@ public class UserService {
         response.setId(savedUser.getId());
         response.setName(savedUser.getName());
         response.setEmail(savedUser.getEmail());
-        response.setPhoneNumber(savedUser.getPhoneNumber());
+        response.setPhoneNumber(savedUser.getPhone());
         return  response;
     }
 
     // findBy userId
-    public UserResponse findById(UUID id)throws UserNotFoundException {
+    public UserResponse findById(String authorizationHeader)throws UserNotFoundException {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new UserNotFoundException("Invalid Authorization header");
+        }
 
+        // ✅ Remove "Bearer "
+        String token = authorizationHeader.substring(7);
+        UUID id = jwtUtil.extractUserId(token);
         Optional<User> user = userRepository.findById(id);
 
         if (user.isPresent()) {
@@ -50,8 +59,8 @@ public class UserService {
             response.setId(user1.getId());
             response.setName(user1.getName());
             response.setEmail(user1.getEmail());
-            response.setPhoneNumber(user1.getPhoneNumber());
-
+            response.setPhoneNumber(user1.getPhone());
+            System.out.print(response);
             return response;
         }
 
@@ -67,7 +76,7 @@ public class UserService {
 
             user.setName(userRequest.getName());
             user.setEmail(userRequest.getEmail());
-            user.setPhoneNumber(userRequest.getPhoneNumber());
+            user.setPhone(userRequest.getPhoneNumber());
 
             User updatedUser = userRepository.save(user);
 
@@ -75,7 +84,7 @@ public class UserService {
             response.setId(updatedUser.getId());
             response.setName(updatedUser.getName());
             response.setEmail(updatedUser.getEmail());
-            response.setPhoneNumber(updatedUser.getPhoneNumber());
+            response.setPhoneNumber(updatedUser.getPhone());
 
             return response;
         }

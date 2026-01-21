@@ -28,6 +28,7 @@ public class AuthController {
     @PostMapping("/verify")
     public ResponseEntity<String> verifyOtp(@RequestBody OtpVerificationRequest verificationRequest) {
         String result = loginService.verifyOtp(verificationRequest);
+        System.out.println(result);
         return ResponseEntity.ok(result);
     }
 

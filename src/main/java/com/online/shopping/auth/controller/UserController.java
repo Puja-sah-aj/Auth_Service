@@ -24,9 +24,9 @@ public class UserController {
         return ResponseEntity.ok(userService.signup(userRequest));
     }
    //findById
-    @GetMapping("/userId/{id}")
-    public ResponseEntity<UserResponse> findById(@PathVariable UUID id)throws UserNotFoundException {
-        return ResponseEntity.ok(userService.findById(id));
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> findById(@RequestHeader("Authorization") String authorizationHeader)throws UserNotFoundException {
+        return ResponseEntity.ok(userService.findById(authorizationHeader));
     }
 
     //updateById
