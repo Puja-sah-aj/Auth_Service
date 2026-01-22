@@ -1,6 +1,7 @@
 package com.online.shopping.auth.service;
 
 import com.online.shopping.auth.dto.UserAddressRequest;
+import com.online.shopping.auth.dto.UserAddressResponse;
 import com.online.shopping.auth.dto.UserRequest;
 import com.online.shopping.auth.dto.UserResponse;
 import com.online.shopping.auth.entity.User;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,28 +57,44 @@ public class UserService {
 
     // findBy userId
     public UserResponse findById(String authorizationHeader) throws UserNotFoundException {
+
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new UserNotFoundException("Invalid Authorization header");
         }
 
-        // ✅ Remove "Bearer "
         String token = authorizationHeader.substring(7);
         UUID id = jwtUtil.extractUserId(token);
-        Optional<User> user = userRepository.findById(id);
 
-        if (user.isPresent()) {
-            User user1 = user.get();
-            UserResponse response = new UserResponse();
-            response.setId(user1.getId());
-            response.setName(user1.getName());
-            response.setEmail(user1.getEmail());
-            response.setPhoneNumber(user1.getPhone());
-            System.out.print(response);
-            return response;
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setPhoneNumber(user.getPhone());
+        response.setGender(user.getGender());
+        response.setDateOfBirth(user.getDateOfBirth());
+
+        List<UserAddressResponse> addressResponses = new ArrayList<>();
+
+        for (UserAddress address : user.getUserAddresses()) {
+            UserAddressResponse ar = new UserAddressResponse();
+            ar.setId(address.getId());
+            ar.setAddressLine1(address.getAddressLine1());
+            ar.setAddressLine2(address.getAddressLine2());
+            ar.setCity(address.getCity());
+            ar.setState(address.getState());
+            ar.setPostalCode(address.getPostalCode());
+            ar.setCountry(address.getCountry());
+            addressResponses.add(ar);
         }
 
-        throw new UserNotFoundException("User not found with id: " + id);
+        response.setUserAddress(addressResponses);
+
+        return response;
     }
+
 
     //updateById
     public UserResponse updateById(UUID id, UserRequest userRequest) throws UserNotFoundException {
@@ -115,7 +133,6 @@ public class UserService {
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhone());
-
         return response;
     }
 
