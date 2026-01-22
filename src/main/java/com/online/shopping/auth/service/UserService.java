@@ -37,13 +37,13 @@ public class UserService {
     //signup
     public UserResponse signup(UserRequest userRequest) throws UserAlreadyExist {
 
-        if (userRepository.existsByPhone(userRequest.getPhoneNumber())) {
-            throw new UserAlreadyExist("Phone number already registered");
-        }
+//        if (userRepository.existsByPhone(userRequest.getPhoneNumber())) {
+//            throw new UserAlreadyExist("Phone number already registered");
+//        }
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
-        user.setPhone(userRequest.getPhoneNumber());
+       // user.setPhone(userRequest.getPhoneNumber());
 
         User savedUser = userRepository.save(user);
 
@@ -97,7 +97,7 @@ public class UserService {
 
 
     //updateById
-    public UserResponse updateById(UUID id, UserRequest userRequest) throws UserNotFoundException {
+    public String updateById(UUID id, UserRequest userRequest) throws UserNotFoundException {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
@@ -105,7 +105,7 @@ public class UserService {
         // Update basic fields
         if (userRequest.getName() != null) user.setName(userRequest.getName());
         if (userRequest.getEmail() != null) user.setEmail(userRequest.getEmail());
-        if (userRequest.getPhoneNumber() != null) user.setPhone(userRequest.getPhoneNumber());
+        //if (userRequest.getPhoneNumber() != null) user.setPhone(userRequest.getPhoneNumber());
         if (userRequest.getDateOfBirth() != null) user.setDateOfBirth(userRequest.getDateOfBirth());
         if (userRequest.getGender() != null) user.setGender(userRequest.getGender());
 
@@ -123,7 +123,7 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
 
-        return buildUserResponse(updatedUser);
+        return "updated successfully";
     }
 
 
@@ -173,6 +173,7 @@ public class UserService {
         UserAddress newAddress = new UserAddress();
 
         newAddress.setAddressLine1(addressRequest.getAddressLine1());
+        newAddress.setAddressLine2(addressRequest.getAddressLine2());
         newAddress.setCity(addressRequest.getCity());
         newAddress.setState(addressRequest.getState());
         newAddress.setPostalCode(String.valueOf(addressRequest.getPostalCode()));

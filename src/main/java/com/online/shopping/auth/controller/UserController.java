@@ -32,7 +32,7 @@ public class UserController {
 
     //updateById
     @PutMapping("/update/{id}")
-    public ResponseEntity<UserResponse> updateById(@PathVariable UUID id,@RequestBody UserRequest userRequest)throws UserNotFoundException{
+    public ResponseEntity<String> updateById(@PathVariable UUID id,@RequestBody UserRequest userRequest)throws UserNotFoundException{
         return ResponseEntity.ok(userService.updateById(id,userRequest));
     }
 
