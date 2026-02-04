@@ -54,6 +54,7 @@ public class LoginService {
         String otp = generateOtp();
         loginEntity.setOtp(otp);
         loginEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+        loginEntity.set_active(true); // Reset the active flag for the new OTP
         
         // Saving the user will cascade and save the loginEntity because of CascadeType.ALL
         userRepository.save(user);
@@ -78,14 +79,19 @@ public class LoginService {
 
             if (loginEntity != null && loginEntity.getOtp() != null && loginEntity.getOtp().equals(verificationRequest.getOtp())) {
                 if (loginEntity.getExpiryTime().isAfter(LocalDateTime.now())) {
-                    // OTP is valid and not expired
-                    // Clear OTP after successful verification
-                    loginEntity.setOtp(null);
-                    loginEntity.setExpiryTime(null);
-                    userRepository.save(user);
+                    if(loginEntity.is_active()){
+                        // OTP is valid and not expired
+                        // Clear OTP after successful verification
+                        loginEntity.setOtp(null);
+                        loginEntity.set_active(false);
+                        loginEntity.setExpiryTime(null);
+                        userRepository.save(user);
 
-                    // Pass the LoginEntity to generateToken, as it expects it
-                    return jwtUtil.generateToken(loginEntity);
+                        // Pass the LoginEntity to generateToken, as it expects it
+                        return jwtUtil.generateToken(loginEntity);
+                    }else{
+                        throw new RuntimeException("OTP already used");
+                    }
                 } else {
                     throw new RuntimeException("OTP has expired");
                 }
