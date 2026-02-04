@@ -19,7 +19,7 @@ public class LoginEntity {
 
     private String otp;
     private LocalDateTime expiryTime;
-
+    boolean is_active;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
