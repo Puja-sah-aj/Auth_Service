@@ -1,3 +1,4 @@
+
 package com.online.shopping.auth.dto;
 
 import lombok.AllArgsConstructor;
@@ -19,3 +20,4 @@ public class UserAddressResponse {
     private String postalCode;
     private String country;
 }
+

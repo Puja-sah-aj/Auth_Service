@@ -91,7 +91,7 @@ public class UserService {
         }
 
         response.setUserAddress(addressResponses);
-        System.out.print(response);
+
         return response;
     }
 
