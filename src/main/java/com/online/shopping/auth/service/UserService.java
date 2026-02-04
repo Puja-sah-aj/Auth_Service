@@ -91,7 +91,7 @@ public class UserService {
         }
 
         response.setUserAddress(addressResponses);
-
+        System.out.print(response);
         return response;
     }
 
@@ -147,7 +147,7 @@ public class UserService {
         throw new UserNotFoundException("User not found with id: " + id);
     }
 
-    public String addAddress(UserAddressRequest userRequest, UUID userId)
+    public UserAddressResponse addAddress(UserAddressRequest userRequest, UUID userId)
             throws UserNotFoundException {
 
         User user = userRepository.findById(userId)
@@ -163,9 +163,36 @@ public class UserService {
 
         user.getUserAddresses().add(address);
 
-        userRepository.save(user); // CASCADE saves address
+        userRepository.saveAndFlush(user);
+        UserAddress savedAddress =
+                user.getUserAddresses().get(user.getUserAddresses().size() - 1);
 
-        return "Address added successfully";
+        UserAddressResponse response = new UserAddressResponse();
+        response.setId(savedAddress.getId());
+        response.setAddressLine1(savedAddress.getAddressLine1());
+        response.setAddressLine2(savedAddress.getAddressLine2());
+        response.setCity(savedAddress.getCity());
+        response.setState(savedAddress.getState());
+        response.setPostalCode(savedAddress.getPostalCode());
+        response.setCountry(savedAddress.getCountry());
+        System.out.print(response);
+        return response;
+
+    }
+
+    public UserAddressResponse getAddressById(UUID addressId) throws UserNotFoundException {
+        UserAddress address = addressRepo.findById(addressId)
+                .orElseThrow(() -> new UserNotFoundException("Address not found with id: " + addressId));
+
+        UserAddressResponse response = new UserAddressResponse();
+        response.setId(address.getId());
+        response.setAddressLine1(address.getAddressLine1());
+        response.setAddressLine2(address.getAddressLine2());
+        response.setCity(address.getCity());
+        response.setState(address.getState());
+        response.setPostalCode(address.getPostalCode());
+        response.setCountry(address.getCountry());
+        return response;
     }
 
 

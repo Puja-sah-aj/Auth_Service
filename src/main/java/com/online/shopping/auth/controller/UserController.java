@@ -1,6 +1,7 @@
 package com.online.shopping.auth.controller;
 
 import com.online.shopping.auth.dto.UserAddressRequest;
+import com.online.shopping.auth.dto.UserAddressResponse;
 import com.online.shopping.auth.dto.UserRequest;
 import com.online.shopping.auth.dto.UserResponse;
 import com.online.shopping.auth.exception.UserAlreadyExist;
@@ -37,8 +38,13 @@ public class UserController {
     }
 
     @PostMapping("/address/{userId}")
-    public ResponseEntity<String> addAddress(@RequestBody UserAddressRequest userRequest, @PathVariable UUID userId)throws UserNotFoundException{
+    public ResponseEntity<UserAddressResponse> addAddress(@RequestBody UserAddressRequest userRequest, @PathVariable UUID userId)throws UserNotFoundException{
         return ResponseEntity.ok(userService.addAddress(userRequest,userId));
+    }
+
+    @GetMapping("/address/{addressId}")
+    public ResponseEntity<UserAddressResponse> getAddressById(@PathVariable UUID addressId) throws UserNotFoundException {
+        return ResponseEntity.ok(userService.getAddressById(addressId));
     }
 
     //deleteById
