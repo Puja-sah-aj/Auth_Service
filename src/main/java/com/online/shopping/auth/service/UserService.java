@@ -37,13 +37,13 @@ public class UserService {
     //signup
     public UserResponse signup(UserRequest userRequest) throws UserAlreadyExist {
 
-        if (userRepository.existsByPhone(userRequest.getPhoneNumber())) {
-            throw new UserAlreadyExist("Phone number already registered");
-        }
+//        if (userRepository.existsByPhone(userRequest.getPhoneNumber())) {
+//            throw new UserAlreadyExist("Phone number already registered");
+//        }
         User user = new User();
         user.setName(userRequest.getName());
         user.setEmail(userRequest.getEmail());
-        user.setPhone(userRequest.getPhoneNumber());
+       // user.setPhone(userRequest.getPhoneNumber());
 
         User savedUser = userRepository.save(user);
 
@@ -95,8 +95,9 @@ public class UserService {
         return response;
     }
 
+
     //updateById
-    public UserResponse updateById(UUID id, UserRequest userRequest) throws UserNotFoundException {
+    public String updateById(UUID id, UserRequest userRequest) throws UserNotFoundException {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
@@ -104,7 +105,7 @@ public class UserService {
         // Update basic fields
         if (userRequest.getName() != null) user.setName(userRequest.getName());
         if (userRequest.getEmail() != null) user.setEmail(userRequest.getEmail());
-        if (userRequest.getPhoneNumber() != null) user.setPhone(userRequest.getPhoneNumber());
+        //if (userRequest.getPhoneNumber() != null) user.setPhone(userRequest.getPhoneNumber());
         if (userRequest.getDateOfBirth() != null) user.setDateOfBirth(userRequest.getDateOfBirth());
         if (userRequest.getGender() != null) user.setGender(userRequest.getGender());
 
@@ -122,7 +123,7 @@ public class UserService {
 
         User updatedUser = userRepository.save(user);
 
-        return buildUserResponse(updatedUser);
+        return "updated successfully";
     }
 
 
@@ -132,7 +133,6 @@ public class UserService {
         response.setName(user.getName());
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhone());
-
         return response;
     }
 
@@ -147,7 +147,7 @@ public class UserService {
         throw new UserNotFoundException("User not found with id: " + id);
     }
 
-    public String addAddress(UserAddressRequest userRequest, UUID userId)
+    public UserAddressResponse addAddress(UserAddressRequest userRequest, UUID userId)
             throws UserNotFoundException {
 
         User user = userRepository.findById(userId)
@@ -163,9 +163,36 @@ public class UserService {
 
         user.getUserAddresses().add(address);
 
-        userRepository.save(user); // CASCADE saves address
+        userRepository.saveAndFlush(user);
+        UserAddress savedAddress =
+                user.getUserAddresses().get(user.getUserAddresses().size() - 1);
 
-        return "Address added successfully";
+        UserAddressResponse response = new UserAddressResponse();
+        response.setId(savedAddress.getId());
+        response.setAddressLine1(savedAddress.getAddressLine1());
+        response.setAddressLine2(savedAddress.getAddressLine2());
+        response.setCity(savedAddress.getCity());
+        response.setState(savedAddress.getState());
+        response.setPostalCode(savedAddress.getPostalCode());
+        response.setCountry(savedAddress.getCountry());
+        System.out.print(response);
+        return response;
+
+    }
+
+    public UserAddressResponse getAddressById(UUID addressId) throws UserNotFoundException {
+        UserAddress address = addressRepo.findById(addressId)
+                .orElseThrow(() -> new UserNotFoundException("Address not found with id: " + addressId));
+
+        UserAddressResponse response = new UserAddressResponse();
+        response.setId(address.getId());
+        response.setAddressLine1(address.getAddressLine1());
+        response.setAddressLine2(address.getAddressLine2());
+        response.setCity(address.getCity());
+        response.setState(address.getState());
+        response.setPostalCode(address.getPostalCode());
+        response.setCountry(address.getCountry());
+        return response;
     }
 
 
@@ -173,6 +200,7 @@ public class UserService {
         UserAddress newAddress = new UserAddress();
 
         newAddress.setAddressLine1(addressRequest.getAddressLine1());
+        newAddress.setAddressLine2(addressRequest.getAddressLine2());
         newAddress.setCity(addressRequest.getCity());
         newAddress.setState(addressRequest.getState());
         newAddress.setPostalCode(String.valueOf(addressRequest.getPostalCode()));

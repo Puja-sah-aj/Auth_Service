@@ -14,7 +14,7 @@ public class LoginEntity {
     private UUID id;
 
     // This field is now redundant as it's in the User entity.
-    // We will keep it for the logic but it can be removed later.
+    // We will keep it for the logic  it can be removed later.
     private String phoneNumber;
 
     private String otp;
